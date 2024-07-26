@@ -1,21 +1,21 @@
-import logo from "./images/images.jpeg";
+import { useState } from "react";
 import "./App.css";
-import Player from "./components/Players";
+import Players from "./components/Players";
+import Board from "./components/Board";
 
 function App() {
-  return (
-    <div className="App">
-      <div className="container">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1>Tic-Tac-Toe</h1>
-        </header>
+  const [game, setGame] = useState(false);
 
-        <div className="players">
-          <Player name="Player 1" symbol="X" />
-          <Player name="Player 2" symbol="O" />
-        </div>
-      </div>
+  const [players, setPlayers] = useState({});
+
+  const playerName = (
+    <Players players={players} setGame={setGame} setPlayers={setPlayers} />
+  );
+
+  return (
+    <div className="app">
+      {!game && playerName}
+      {game && <Board players={players} />}
     </div>
   );
 }
