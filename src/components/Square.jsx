@@ -7,12 +7,14 @@ function Square({
   newBoard,
   rIndex,
   cIndex,
+  setCount,
+  winner,
 }) {
   const [mark, setMark] = useState("");
 
   const handleClick = () => {
     setMark(symbol);
-
+    setCount((count) => count + 1);
     setNewBoard((prev) => {
       const newBoard = [[...prev[0]], [...prev[1]], [...prev[2]]];
       newBoard[rIndex][cIndex] = symbol;
@@ -26,6 +28,7 @@ function Square({
     <button
       className={mark === "X" ? "col red" : "col green"}
       onClick={handleClick}
+      disabled={newBoard[rIndex][cIndex] !== null || winner}
     >
       {newBoard[rIndex][cIndex]}
     </button>
