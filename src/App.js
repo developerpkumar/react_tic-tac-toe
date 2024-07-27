@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="app">
       {!game && playerName}
-      {game && <Board players={players} />}
+      {game && <Board players={players} setPlayers={setPlayers} />}
     </div>
   );
 }
