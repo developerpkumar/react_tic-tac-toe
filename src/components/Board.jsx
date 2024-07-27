@@ -17,7 +17,9 @@ const Board = ({ players, setPlayers }) => {
 
   const [winner, setWinner] = useState(null);
 
-  const [ties, setTies] = useState(false);
+  const [ties, setTies] = useState(0);
+
+  const [isTie, setIsTie] = useState(false);
 
   const [count, setCount] = useState(0);
 
@@ -25,8 +27,7 @@ const Board = ({ players, setPlayers }) => {
 
   let win = false;
 
-  if (ties === false && !winner) {
-    console.log("Check", count);
+  if (!isTie && !winner) {
     if (
       (updatedBoard[0][0] !== null &&
         updatedBoard[0][0] === updatedBoard[0][1] &&
@@ -55,69 +56,110 @@ const Board = ({ players, setPlayers }) => {
     ) {
       win = true;
     }
+    if (count === 9 && !win) {
+      setIsTie(true);
+      setCount(0);
+    }
   }
 
   if (win) {
     setWinner(() => {
-      if (activePlayer === player1.symbol) return player2.name;
-      else return player1.name;
+      if (activePlayer === player1.symbol) {
+        return player2.name;
+      } else {
+        return player1.name;
+      }
     });
-
-    if (count === 9 && !winner) {
-      setTies((pre) => true);
-    }
   }
 
   const handlePlayAgain = () => {
     setNewBoard(initialBoard);
     setActivePlayer(player1.symbol);
     setCount(0);
+
+    if (winner === player1.name) {
+      setPlayers((prev) => {
+        return {
+          ...prev,
+          player1: { ...prev.player1, wins: prev.player1.wins + 1 },
+        };
+      });
+    } else if (winner === player2.name) {
+      setPlayers((prev) => {
+        return {
+          ...prev,
+          player2: { ...prev.player2, wins: prev.player2.wins + 1 },
+        };
+      });
+    }
+
+    if (!winner) setTies((prev) => prev + 1);
+
     setWinner(null);
-    setTies((pre) => false);
+
+    setIsTie(false);
   };
 
   const playerInfo = (
     <div className="player-card">
-      <div>
+      <div className="center">
         <p>Wins: {player1.wins}</p>
-        <p>{player1.name}</p>
+        <p className="player-name">
+          <span className="turn-btn red">X</span>
+          {player1.name}
+        </p>
       </div>
-      <p>Ties: 0</p>
-      <div>
+      <p className="center">Ties: {ties}</p>
+      <div className="center">
         <p>Wins: {player2.wins}</p>
-        <p>{player2.name}</p>
+        <p className="player-name">
+          <span className="turn-btn green">O</span>
+          {player2.name}
+        </p>
       </div>
     </div>
   );
 
   const winnerCard = (
-    <div>
-      <p>{winner} wins</p>
-      <button onClick={handlePlayAgain}>Play Again!</button>
-    </div>
+    <p className="center border">
+      <span
+        className={winner === player1.name ? "red turn-btn" : "green turn-btn"}
+      >
+        {winner === player1.name ? "X" : "O"}
+      </span>
+      {winner} wins
+      <span onClick={handlePlayAgain} className="play-again">
+        Play Again!
+      </span>
+    </p>
   );
 
   const tieGameCard = (
-    <div>
-      <p>Game Ties</p>
-      <button onClick={handlePlayAgain}>Play Again!</button>
-    </div>
+    <p className="center border">
+      Game Ties
+      <span className="play-again" onClick={handlePlayAgain}>
+        Play Again!
+      </span>
+    </p>
+  );
+
+  const turnCard = (
+    <p className="center">
+      <span className={activePlayer == "X" ? "red turn-btn" : "green turn-btn"}>
+        {activePlayer}
+      </span>
+      Yours turn
+    </p>
   );
 
   return (
     <div>
-      {winner && winnerCard}
-      {ties && !winner && tieGameCard}
-      {
-        <p>
-          <span
-            className={activePlayer == "X" ? "red turn-btn" : "green turn-btn"}
-          >
-            {activePlayer}
-          </span>{" "}
-          Yours turn
-        </p>
-      }
+      <div className="game-info">
+        {winner && winnerCard}
+        {isTie && tieGameCard}
+        {!isTie && !winner && turnCard}
+      </div>
+
       <div className="board-square">
         {newBoard.map((row, rIndex) => {
           return (
@@ -142,7 +184,7 @@ const Board = ({ players, setPlayers }) => {
         })}
       </div>
 
-      {playerInfo}
+      <div>{playerInfo}</div>
     </div>
   );
 };
